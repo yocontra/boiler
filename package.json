@@ -1,0 +1,7 @@
+{
+  "name":"sandbox",
+  "version":"0.0.1",
+  "dependencies":{
+    "connect":"*"
+  }
+}
