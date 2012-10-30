@@ -20,7 +20,7 @@ define(["js/Person", "js/People"], function(Person, People){
         });
       });
 
-      window.chan = main;
+      // chan.emit('change', 0, 'busy', true)
     });
 
     employees.bind($("#main"));
