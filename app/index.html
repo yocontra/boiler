@@ -3,14 +3,17 @@
 <head>
   <title>Sandbox</title>
   <style type="text/css">
-  
+    .busy {
+      background-color: red;
+    }
   </style>
 </head>
 <body>
   <div id="main">
     <ul>
-      <li data-each-person=".">
-        <p data-text="person.name"></p>
+      <li data-each-person=":getAvailable < . .child">
+        <img data-src="person.photo"/>
+        <span data-text="person.name"></span>
       </li>
     </ul>
   </div>
