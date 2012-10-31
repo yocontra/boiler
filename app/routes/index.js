@@ -6,7 +6,7 @@ define(["js/Person", "js/People"], function(Person, People){
   var main = pulse.channel('main');
 
   app.show = function(){
-    var employees = People;
+    var employees = People.create();
 
     server.ready(function(){
 
