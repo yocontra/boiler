@@ -1,9 +1,24 @@
 {
-  "name":"sandbox",
+  "name":"boiler",
   "version":"0.0.1",
   "dependencies":{
+    "coffee-script":"*",
     "connect":"*",
-    "vein":"*",
-    "pulsar":"*"
+    "vein":"*"
+  },
+  "devDependencies": {
+    "jaded": "*",
+    "grunt": "*",
+    "grunt-reload": "*",
+    "grunt-coffee": "*",
+    "grunt-exec": "*",
+    "grunt-contrib": "*",
+    "grunt-jaded": "*"
+  },
+  "scripts":{
+    "start":"coffee server/start.coffee"
+  },
+  "engines": {
+    "node": ">=0.6"
   }
 }
