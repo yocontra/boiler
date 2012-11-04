@@ -3,7 +3,7 @@
   "version":"0.0.1",
   "dependencies":{
     "coffee-script":"*",
-    "connect":"*",
+    "express":"*",
     "vein":"*"
   },
   "devDependencies": {
@@ -14,9 +14,7 @@
     "grunt-exec": "*",
     "grunt-contrib": "*",
     "grunt-jaded": "*",
-    "grunt-clean": "*",
     "grunt-check-modules": "*",
-    "grunt-coffeelint": "*",
     "grunt-rm": "*"
   },
   "scripts":{

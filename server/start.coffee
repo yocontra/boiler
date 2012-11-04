@@ -1,12 +1,14 @@
-connect = require 'connect'
+express = require 'express'
+http = require 'http'
 Vein = require 'vein'
 {join} = require 'path'
 
 config = require './config'
 
-app = connect()
-app.use connect.static  join __dirname, '../public'
-server = app.listen config.port
+app = express()
+app.use express.static  join __dirname, '../public'
+
+server = http.createServer(app).listen config.port
 
 # RPC
 rpc = Vein.createServer server: server
