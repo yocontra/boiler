@@ -34,9 +34,6 @@ gruntConfig =
 
   reload: {}
 
-  lint:
-    files: [ "public/js/routes/*.js", "public/js/*.js", "server/**/*.js" ]
-
   copy:
     dist:
       files:
