@@ -15,13 +15,13 @@ gruntConfig =
 
   coffee:
     app:
-      src: [ "./client/js/*.coffee" ]
+      src: [ "./client/js/*.coffee", "./client/js/*.js" ]
       dest:  "./public/js"
       options:
         bare: true
 
     routes:
-      src: [ "./client/js/routes/*.coffee" ]
+      src: [ "./client/js/routes/*.coffee", "./client/js/routes/*.js" ]
       dest:  "./public/js/routes"
       options:
         bare: true
@@ -80,7 +80,9 @@ gruntConfig =
 
     coffee:
       files: [
-       "<config:coffee.app.src>"
+       "<config:coffee.app.src>",
+       "<config:coffee.routes.src>",
+       "<config:coffee.vendor.src>"
       ]
       tasks: "coffeelint coffee reload"
 
