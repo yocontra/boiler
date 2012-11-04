@@ -13,7 +13,11 @@
     "grunt-coffee": "*",
     "grunt-exec": "*",
     "grunt-contrib": "*",
-    "grunt-jaded": "*"
+    "grunt-jaded": "*",
+    "grunt-clean": "*",
+    "grunt-check-modules": "*",
+    "grunt-coffeelint": "*",
+    "grunt-rm": "*"
   },
   "scripts":{
     "start":"coffee server/start.coffee"

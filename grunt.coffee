@@ -1,19 +1,13 @@
-path = {join} = require 'path'
-coffee = require 'coffee-script'
-
-app =
-  paths:
-    client: "./client"
-    server: "./server"
-    public: "./public"
-
 gruntConfig =
   pkg: "<json:package.json>"
 
+  rm:
+    public: "./public/**"
+
   jaded:
     app:
-      src: [ "#{app.paths.client}/templates/*.jade" ]
-      dest:  "#{app.paths.public}/templates"
+      src: [ "./client/templates/*.jade" ]
+      dest:  "./public/templates"
       options:
         amd: true
         development: false
@@ -21,35 +15,43 @@ gruntConfig =
 
   coffee:
     app:
-      src: [ "#{app.paths.client}/js/*.coffee" ]
-      dest:  "#{app.paths.public}/js"
+      src: [ "./client/js/*.coffee" ]
+      dest:  "./public/js"
       options:
         bare: true
 
     routes:
-      src: [ "#{app.paths.client}/js/routes/*.coffee" ]
-      dest:  "#{app.paths.public}/js/routes"
+      src: [ "./client/js/routes/*.coffee" ]
+      dest:  "./public/js/routes"
       options:
         bare: true
 
     vendor:
-      src: [ "#{app.paths.client}/js/vendor/*.coffee" ]
-      dest:  "#{app.paths.public}/js/vendor"
+      src: [ "./client/js/vendor/*.coffee" ]
+      dest:  "./public/js/vendor"
       options:
         bare: true
 
   reload: {}
 
+  coffeelint:
+    app: [
+      "client/js/**/*.coffee",
+      "client/js/*.coffee",
+      "server/*.coffee",
+      "server/**/*.coffee"
+    ]
+
   lint:
-    files: [ "grunt.js", "lib/**/*.js" ]
+    files: [ "public/js/routes/*.js", "public/js/*.js", "server/**/*.js" ]
 
   copy:
-    dist: 
+    dist:
       files:
-        "./public/js/vendor/": "#{app.paths.client}/js/vendor/**"
-        "./public/css/": "#{app.paths.client}/css/**"
-        "./public/img/": "#{app.paths.client}/img/**"
-        "./public/": "#{app.paths.client}/index.html"
+        "./public/js/vendor/": "./client/js/vendor/**"
+        "./public/css/": "./client/css/**"
+        "./public/img/": "./client/img/**"
+        "./public/index.html": "./client/index.html"
 
   ##
   ## watch
@@ -58,9 +60,10 @@ gruntConfig =
   watch:
     client: 
       files: [
-        "#{app.paths.client}/js/vendor/**",
-        "#{app.paths.client}/css/**",
-        "#{app.paths.client}/index.html"
+        "./client/js/vendor/**",
+        "./client/css/**",
+        "./client/img/**",
+        "./client/index.html"
       ]
       tasks: "copy reload"
 
@@ -68,13 +71,18 @@ gruntConfig =
       files: ["<config:jaded.app.src>"]
       tasks: "jaded reload"  
 
+    server:
+      files: [
+        "./server/*.coffee",
+        "./server/**/*.coffee"
+      ]
+      tasks: "coffeelint"
+
     coffee:
       files: [
-       "<config:coffee.app.src>",
-       "<config:coffee.routes.src>",
-       "<config:coffee.vendor.src>"
+       "<config:coffee.app.src>"
       ]
-      tasks: "coffee reload"
+      tasks: "coffeelint coffee reload"
 
   globals:
     exports: true
@@ -88,11 +96,15 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks "grunt-reload"
   grunt.loadNpmTasks "grunt-exec"
   grunt.loadNpmTasks "grunt-jaded"
+  grunt.loadNpmTasks "grunt-clean"
+  grunt.loadNpmTasks "grunt-check-modules"
+  grunt.loadNpmTasks "grunt-coffeelint"
+  grunt.loadNpmTasks "grunt-rm"
 
   ## default 
-  grunt.registerTask "default", "start copy jaded lint coffee reload watch"
+  grunt.registerTask "default", "check-modules rm copy coffeelint coffee jaded reload start watch"
 
   ## start
   grunt.registerTask "start", "start up servers", ->
-    grunt.log.writeln "starting..."
-    server = require "#{app.paths.server}/start"
+    grunt.log.writeln "Starting server..."
+    server = require "./server/start"
