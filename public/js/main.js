@@ -1,4 +1,8 @@
+var __slice = [].slice;
 
-define(["app/routes"], function(routes) {
-  return routes.load();
+define(["app/server"], function(server) {
+  dermis.route('/');
+  return server.ready(function(services) {
+    return console.log.apply(console, ["Server connected:"].concat(__slice.call(services)));
+  });
 });

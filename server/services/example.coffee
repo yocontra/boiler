@@ -1,2 +1,2 @@
 module.exports = (cb) ->
-  cb()
+  cb "Hey!"

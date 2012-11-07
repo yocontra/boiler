@@ -1,3 +1,0 @@
-define ->
-  load: ->
-    dermis.route '/'
