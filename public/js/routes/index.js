@@ -1,13 +1,17 @@
 
-define(["templates/index"], function(indexTempl) {
+define(["app/server", "templates/index"], function(server, indexTempl) {
   return {
     init: function() {
       return this.emit('ready');
     },
     show: function() {
-      return $("#main").html(indexTempl({
-        message: "Hello"
-      }));
+      return server.ready(function() {
+        return server.example(function(msg) {
+          return $("#main").html(indexTempl({
+            message: msg
+          }));
+        });
+      });
     },
     hide: function() {}
   };

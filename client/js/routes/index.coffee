@@ -1,7 +1,8 @@
-define ["templates/index"], (indexTempl) ->
+define ["app/server", "templates/index"], (server, indexTempl) ->
   init: -> @emit 'ready'
   
   show: ->
-    $("#main").html indexTempl message: "Hello"
-
+    server.ready ->
+      server.example (msg) ->
+        $("#main").html indexTempl message: msg
   hide: ->
