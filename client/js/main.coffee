@@ -1,1 +1,2 @@
-dermis.route '/'
+define ["app/routes"], (routes) ->
+  routes.load()

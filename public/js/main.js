@@ -1,2 +1,4 @@
 
-dermis.route('/');
+define(["app/routes"], function(routes) {
+  return routes.load();
+});
