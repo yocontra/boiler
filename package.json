@@ -15,7 +15,8 @@
     "grunt-contrib": "*",
     "grunt-jaded": "*",
     "grunt-check-modules": "*",
-    "grunt-rm": "*"
+    "grunt-rm": "*",
+    "grunt-smushit": "*"
   },
   "scripts":{
     "start":"coffee server/start.coffee"

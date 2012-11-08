@@ -1,6 +1,10 @@
 gruntConfig =
   pkg: "<json:package.json>"
 
+  smushit:
+    app:
+      src: "./client/img"
+      dest: "./public/img"
   rm:
     public: "./public/**"
 
@@ -16,19 +20,19 @@ gruntConfig =
   coffee:
     app:
       src: [ "./client/js/*.coffee", "./client/js/*.js" ]
-      dest:  "./public/js"
+      dest:  "./public/js/"
       options:
         bare: true
 
     routes:
       src: [ "./client/js/routes/*.coffee", "./client/js/routes/*.js" ]
-      dest:  "./public/js/routes"
+      dest:  "./public/js/routes/"
       options:
         bare: true
 
     vendor:
       src: [ "./client/js/vendor/*.coffee" ]
-      dest:  "./public/js/vendor"
+      dest:  "./public/js/vendor/"
       options:
         bare: true
 
@@ -76,12 +80,13 @@ module.exports = (grunt) ->
   grunt.initConfig gruntConfig
 
   grunt.loadNpmTasks "grunt-contrib"
-  grunt.loadNpmTasks "grunt-coffee"   
   grunt.loadNpmTasks "grunt-reload"
   grunt.loadNpmTasks "grunt-exec"
+  grunt.loadNpmTasks "grunt-coffee"
   grunt.loadNpmTasks "grunt-jaded"
   grunt.loadNpmTasks "grunt-check-modules"
   grunt.loadNpmTasks "grunt-rm"
+  grunt.loadNpmTasks "grunt-smushit"
 
   ## default 
   grunt.registerTask "default", "check-modules rm copy coffee jaded reload start watch"

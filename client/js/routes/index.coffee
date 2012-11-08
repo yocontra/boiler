@@ -5,4 +5,5 @@ define ["app/server", "templates/index"], (server, indexTempl) ->
     server.ready ->
       server.example (msg) ->
         $("#main").html indexTempl message: msg
+
   hide: ->
