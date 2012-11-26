@@ -11,7 +11,7 @@ app.use express.static  join __dirname, '../public'
 server = http.createServer(app).listen config.port
 
 # RPC
-rpc = Vein.createServer server: server
+rpc = Vein.createServer server
 
 rpc.addFolder join __dirname, './services'
 
