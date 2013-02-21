@@ -3,6 +3,8 @@ grunt = require 'grunt'
 gruntConfig =
   pkg: grunt.file.readJSON('package.json')
 
+  reload: {}
+
   clean:
     public: ["public"]
 
@@ -85,12 +87,7 @@ gruntConfig =
         dest: "public/index.html"
       ]
 
-  ##
-  ## watch
-  ##
-
   watch:
-    # TODO: add reload to all of these
     client: 
       files: [
         "client/js/vendor/**",
@@ -98,17 +95,15 @@ gruntConfig =
         "client/img/**",
         "client/index.html"
       ]
-      tasks: ["copy"]
+      tasks: ["copy", "reload"]
       options:
         debounceDelay: 100
-        interrupt: true
 
     templates:
       files: ["<%= jaded.app.src %>"]
-      tasks: ["jaded"]
+      tasks: ["jaded", "reload"]
       options:
         debounceDelay: 100
-        interrupt: true
 
     coffee:
       files: [
@@ -118,10 +113,9 @@ gruntConfig =
        "<%= coffee.layouts.src %>",
        "<%= coffee.vendor.src %>"
       ]
-      tasks: ["coffee"]
+      tasks: ["coffee", "reload"]
       options:
         debounceDelay: 100
-        interrupt: true
 
   globals:
     exports: true
@@ -136,12 +130,13 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks "grunt-contrib-connect"
   grunt.loadNpmTasks "grunt-contrib-clean"
   grunt.loadNpmTasks "grunt-jaded"
+  grunt.loadNpmTasks "grunt-reload"
 
   ## default 
   grunt.registerTask "default", ["clean",
     "copy","coffee",
-    "jaded",
-    "start","watch"]
+    "jaded","start",
+    "reload","watch"]
 
   ## start
   grunt.registerTask "start", "start up servers", ->

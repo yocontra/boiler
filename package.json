@@ -12,7 +12,8 @@
     "grunt-contrib-copy": "*",
     "grunt-contrib-watch": "*",
     "grunt-contrib-clean": "*",
-    "grunt-jaded": "*"
+    "grunt-jaded": "*",
+    "grunt-reload": "https://github.com/webxl/grunt-reload/archive/master.tar.gz"
   },
   "scripts":{
     "start":"coffee server/start.coffee"
