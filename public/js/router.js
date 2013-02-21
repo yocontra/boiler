@@ -1,5 +1,5 @@
 
-define(["layouts/App", "views/Index", "views/Sidebar", "views/Other", "views/NotFound"], function(appLayout, Index, Sidebar, Other, NotFound) {
+define(["layouts/App", "views/Index", "views/Sidebar", "views/User", "views/NotFound"], function(appLayout, Index, Sidebar, User, NotFound) {
   var doSidebar;
   doSidebar = function() {
     var sidevu;
@@ -18,9 +18,9 @@ define(["layouts/App", "views/Index", "views/Sidebar", "views/Other", "views/Not
       appLayout.show("main");
       return doSidebar();
     },
-    "/other/:id": function(ctx) {
+    "/user/:id": function(ctx) {
       var vu;
-      vu = new Other;
+      vu = new User;
       appLayout.set("main", vu);
       appLayout.show("main", ctx.params);
       return doSidebar();

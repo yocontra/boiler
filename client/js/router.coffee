@@ -1,7 +1,7 @@
 define ["layouts/App","views/Index", 
-  "views/Sidebar", "views/Other",
+  "views/Sidebar", "views/User",
   "views/NotFound"], 
-(appLayout, Index, Sidebar, Other, NotFound) ->
+(appLayout, Index, Sidebar, User, NotFound) ->
   doSidebar = ->
     return if appLayout.get("sidebar") instanceof Sidebar
     sidevu = new Sidebar
@@ -15,8 +15,8 @@ define ["layouts/App","views/Index",
       appLayout.show "main"
       doSidebar()
 
-    "/other/:id": (ctx) ->
-      vu = new Other
+    "/user/:id": (ctx) ->
+      vu = new User
       appLayout.set "main", vu
       appLayout.show "main", ctx.params
       doSidebar()
