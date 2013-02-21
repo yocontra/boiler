@@ -7,16 +7,12 @@
     "vein":"*"
   },
   "devDependencies": {
-    "jaded": "*",
     "grunt": "*",
-    "grunt-reload": "*",
-    "grunt-coffee": "*",
-    "grunt-exec": "*",
-    "grunt-contrib": "*",
-    "grunt-jaded": "*",
-    "grunt-check-modules": "*",
-    "grunt-rm": "*",
-    "grunt-smushit": "*"
+    "grunt-contrib-coffee": "*",
+    "grunt-contrib-copy": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-contrib-clean": "*",
+    "grunt-jaded": "*"
   },
   "scripts":{
     "start":"coffee server/start.coffee"

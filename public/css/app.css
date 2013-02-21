@@ -1,0 +1,10 @@
+/* Standard CSS */
+
+body {
+  padding-top: 30px;
+  padding-bottom: 40px;
+}
+
+.sidebar-nav {
+  padding: 9px 0;
+}
