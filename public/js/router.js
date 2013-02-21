@@ -1,5 +1,5 @@
 
-define(["layouts/App", "views/Index", "views/Sidebar", "views/Other", "views/FourOhFour"], function(appLayout, Index, Sidebar, Other, FourOhFour) {
+define(["layouts/App", "views/Index", "views/Sidebar", "views/Other", "views/NotFound"], function(appLayout, Index, Sidebar, Other, NotFound) {
   var doSidebar;
   doSidebar = function() {
     var sidevu;
@@ -27,7 +27,7 @@ define(["layouts/App", "views/Index", "views/Sidebar", "views/Other", "views/Fou
     },
     "*": function() {
       var vu;
-      vu = new FourOhFour;
+      vu = new NotFound;
       appLayout.set("main", vu);
       return appLayout.show("main");
     }
