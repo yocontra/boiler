@@ -77,9 +77,7 @@ gruntConfig =
       src: "client/index.html"
       dest: "public/index.html"
 
-
-  watch: {}
-
+gruntConfig.watch = {}
 toWatch = ["coffee","jaded","copy"]
 for cat in toWatch
   for set, files of gruntConfig[cat]
@@ -91,8 +89,6 @@ for cat in toWatch
     gruntConfig.watch[set] =
       files: fls
       tasks: ["#{cat}:#{set}","reload"]
-
-console.log gruntConfig.watch
 
 module.exports = (grunt) ->
   ## init config 
