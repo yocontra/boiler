@@ -86,7 +86,7 @@ for cat in toWatch
       fls = explode files.cwd, files.src
     else
       fls = files.src
-    gruntConfig.watch[set] =
+    gruntConfig.watch["#{set}-#{cat}"] =
       files: fls
       tasks: ["#{cat}:#{set}","reload"]
 

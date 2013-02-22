@@ -13,17 +13,17 @@ define(["layouts/App", "views/Index", "views/Sidebar", "views/User", "views/NotF
   dermis.router.add({
     "/": function(ctx) {
       var vu;
+      doSidebar();
       vu = new Index;
       appLayout.set("main", vu);
-      appLayout.show("main");
-      return doSidebar();
+      return appLayout.show("main");
     },
     "/user/:id": function(ctx) {
       var vu;
+      doSidebar();
       vu = new User;
       appLayout.set("main", vu);
-      appLayout.show("main", ctx.params);
-      return doSidebar();
+      return appLayout.show("main", ctx.params);
     },
     "*": function() {
       var vu;

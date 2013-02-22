@@ -5,6 +5,7 @@ define ["app/server", "app/channel", "templates/user"], (server, channel, templ)
     render: ({id}) ->
       @$el.html @template id: id
       channel.emit "user.rendered"
+      channel.emit "sidebar.user", id
       return @
 
   return User

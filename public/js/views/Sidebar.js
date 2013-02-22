@@ -16,7 +16,16 @@ define(["app/server", "app/channel", "templates/sidebar"], function(server, chan
     Sidebar.prototype.template = templ;
 
     Sidebar.prototype.render = function() {
+      var _this = this;
       this.$el.html(this.template());
+      channel.on("sidebar.user", function(id) {
+        _this.$(".active").removeClass("active");
+        return _this.$("li[data-user='" + id + "']").addClass("active");
+      });
+      channel.on("sidebar.page", function(page) {
+        _this.$(".active").removeClass("active");
+        return _this.$("li[data-page='" + page + "']").addClass("active");
+      });
       channel.emit("sidebar.rendered");
       return this;
     };

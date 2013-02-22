@@ -10,16 +10,16 @@ define ["layouts/App","views/Index",
 
   dermis.router.add
     "/": (ctx) ->
+      doSidebar()
       vu = new Index
       appLayout.set "main", vu
       appLayout.show "main"
-      doSidebar()
 
     "/user/:id": (ctx) ->
+      doSidebar()
       vu = new User
       appLayout.set "main", vu
       appLayout.show "main", ctx.params
-      doSidebar()
 
     "*": ->
       vu = new NotFound

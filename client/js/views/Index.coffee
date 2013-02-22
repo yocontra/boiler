@@ -3,6 +3,7 @@ define ["app/server", "app/channel", "templates/index"], (server, channel, templ
     className: "index-view"
     template: templ
     render: ->
+      channel.emit "sidebar.page", "index"
       server.ready =>
         server.example (msg) =>
           @$el.html @template message: msg

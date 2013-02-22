@@ -17,6 +17,7 @@ define(["app/server", "app/channel", "templates/index"], function(server, channe
 
     Index.prototype.render = function() {
       var _this = this;
+      channel.emit("sidebar.page", "index");
       server.ready(function() {
         return server.example(function(msg) {
           _this.$el.html(_this.template({

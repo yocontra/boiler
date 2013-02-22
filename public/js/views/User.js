@@ -22,6 +22,7 @@ define(["app/server", "app/channel", "templates/user"], function(server, channel
         id: id
       }));
       channel.emit("user.rendered");
+      channel.emit("sidebar.user", id);
       return this;
     };
 
