@@ -2,7 +2,7 @@ grunt = require 'grunt'
 
 explode = (cwd, files) ->
   files = [files] unless Array.isArray files
-  return ("#{cwd}#{f}" for f in files)
+  return ("#{cwd}/#{f}" for f in files)
 
 gruntConfig =
   pkg: grunt.file.readJSON('package.json')
@@ -78,50 +78,21 @@ gruntConfig =
       dest: "public/index.html"
 
 
-  watch:
-    vendor:
-      cwd: "<%= copy.vendor.cwd %>"
-      files: "<%= copy.vendor.src %>"
-      tasks: ["copy:vendor", "reload"]
+  watch: {}
 
-    images:
+toWatch = ["coffee","jaded","copy"]
+for cat in toWatch
+  for set, files of gruntConfig[cat]
+    continue if set is 'options'
+    if files.cwd
+      fls = explode files.cwd, files.src
+    else
+      fls = files.src
+    gruntConfig.watch[set] =
+      files: fls
+      tasks: ["#{cat}:#{set}","reload"]
 
-      cwd: "<%= copy.images.cwd %>"
-      files: "<%= copy.images.src %>"
-      tasks: ["copy:images", "reload"]
-
-    css:
-      files: "<%= copy.css.src %>"
-      tasks: ["copy:css", "reload"]
-
-    static:
-      files: "<%= copy.static.src %>"
-      tasks: ["copy:static", "reload"]
-
-    templates:
-      cwd: "<%= jaded.app.cwd %>"
-      files: "<%= jaded.app.src %>"
-      tasks: ["jaded:app", "reload"]
-
-    app:
-      cwd: "<%= coffee.app.cwd %>"
-      files: "<%= coffee.app.src %>"
-      tasks: ["coffee:app", "reload"]
-
-    views:
-      cwd: "<%= coffee.views.cwd %>"
-      files: "<%= coffee.views.src %>"
-      tasks: ["coffee:views", "reload"]
-
-    models:
-      cwd: "<%= coffee.models.cwd %>"
-      files: "<%= coffee.models.src %>"
-      tasks: ["coffee:models", "reload"]
-
-    layouts:
-      cwd: "<%= coffee.layouts.cwd %>"
-      files: "<%= coffee.layouts.src %>"
-      tasks: ["coffee:layouts", "reload"]
+console.log gruntConfig.watch
 
 module.exports = (grunt) ->
   ## init config 
