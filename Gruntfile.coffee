@@ -1,5 +1,9 @@
 grunt = require 'grunt'
 
+explode = (cwd, files) ->
+  files = [files] unless Array.isArray files
+  return ("#{cwd}#{f}" for f in files)
+
 gruntConfig =
   pkg: grunt.file.readJSON('package.json')
 
@@ -74,13 +78,14 @@ gruntConfig =
       dest: "public/index.html"
 
 
-  regarde:
+  watch:
     vendor:
       cwd: "<%= copy.vendor.cwd %>"
       files: "<%= copy.vendor.src %>"
       tasks: ["copy:vendor", "reload"]
 
     images:
+
       cwd: "<%= copy.images.cwd %>"
       files: "<%= copy.images.src %>"
       tasks: ["copy:images", "reload"]
@@ -127,13 +132,13 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks "grunt-contrib-clean"
   grunt.loadNpmTasks "grunt-jaded"
   grunt.loadNpmTasks "grunt-reload"
-  grunt.loadNpmTasks "grunt-regarde"
+  grunt.loadNpmTasks "grunt-contrib-watch"
 
   ## default 
   grunt.registerTask "default", ["clean",
     "copy","coffee",
     "jaded","start",
-    "reload","regarde"]
+    "reload","watch"]
 
   ## start
   grunt.registerTask "start", "start up servers", ->
