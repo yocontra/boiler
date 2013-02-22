@@ -20,14 +20,14 @@ gruntConfig =
         rivets: false
 
   coffee:
+    options:
+      bare: true
     app:
       expand: true
       cwd: "client/js/"
       src: [ "*.coffee", "*.js" ]
       dest:  "public/js/"
       ext: ".js"
-      options:
-        bare: true
 
     views:
       expand: true
@@ -35,8 +35,6 @@ gruntConfig =
       src: [ "*.coffee", "*.js" ]
       dest:  "public/js/views"
       ext: ".js"
-      options:
-        bare: true
 
     layouts:
       expand: true
@@ -44,8 +42,6 @@ gruntConfig =
       src: [ "*.coffee", "*.js" ]
       dest:  "public/js/layouts"
       ext: ".js"
-      options:
-        bare: true
 
     models:
       expand: true
@@ -53,90 +49,91 @@ gruntConfig =
       src: [ "*.coffee", "*.js" ]
       dest:  "public/js/models"
       ext: ".js"
-      options:
-        bare: true
-
-    vendor:
-      expand: true
-      cwd: "client/js/vendor"
-      src: [ "*.coffee" ]
-      dest:  "public/js/vendor"
-      ext: ".js"
-      options:
-        bare: true
 
   copy:
-    dist:
-      files: [
-        expand: true
-        src: ["**"]
-        dest: "public/js/vendor/"
-        cwd: "client/js/vendor"
-      ,
-        expand: true
-        src: ["**"]
-        dest: "public/css"
-        cwd: "client/css"
-      ,
-        expand: true
-        src: ["**"]
-        dest: "public/img"
-        cwd: "client/img"
-      ,
-        src: "client/index.html"
-        dest: "public/index.html"
-      ]
+    vendor:
+      expand: true
+      src: ["**/*.js"]
+      dest: "public/js/vendor/"
+      cwd: "client/js/vendor"
 
-  watch:
-    client: 
-      files: [
-        "client/js/vendor/**",
-        "client/css/**",
-        "client/img/**",
-        "client/index.html"
-      ]
-      tasks: ["copy", "reload"]
-      options:
-        debounceDelay: 100
+    images:
+      expand: true
+      src: ["**"]
+      dest: "public/img"
+      cwd: "client/img"
+
+    css:
+      expand: true
+      src: ["**"]
+      dest: "public/css"
+      cwd: "client/css"
+
+    static:
+      src: "client/index.html"
+      dest: "public/index.html"
+
+
+  regarde:
+    vendor:
+      cwd: "<%= copy.vendor.cwd %>"
+      files: "<%= copy.vendor.src %>"
+      tasks: ["copy:vendor", "reload"]
+
+    images:
+      cwd: "<%= copy.images.cwd %>"
+      files: "<%= copy.images.src %>"
+      tasks: ["copy:images", "reload"]
+
+    css:
+      files: "<%= copy.css.src %>"
+      tasks: ["copy:css", "reload"]
+
+    static:
+      files: "<%= copy.static.src %>"
+      tasks: ["copy:static", "reload"]
 
     templates:
-      files: ["<%= jaded.app.src %>"]
-      tasks: ["jaded", "reload"]
-      options:
-        debounceDelay: 100
+      cwd: "<%= jaded.app.cwd %>"
+      files: "<%= jaded.app.src %>"
+      tasks: ["jaded:app", "reload"]
 
-    coffee:
-      files: [
-       "<%= coffee.app.src %>",
-       "<%= coffee.views.src %>",
-       "<%= coffee.models.src %>",
-       "<%= coffee.layouts.src %>",
-       "<%= coffee.vendor.src %>"
-      ]
-      tasks: ["coffee", "reload"]
-      options:
-        debounceDelay: 100
+    app:
+      cwd: "<%= coffee.app.cwd %>"
+      files: "<%= coffee.app.src %>"
+      tasks: ["coffee:app", "reload"]
 
-  globals:
-    exports: true
+    views:
+      cwd: "<%= coffee.views.cwd %>"
+      files: "<%= coffee.views.src %>"
+      tasks: ["coffee:views", "reload"]
+
+    models:
+      cwd: "<%= coffee.models.cwd %>"
+      files: "<%= coffee.models.src %>"
+      tasks: ["coffee:models", "reload"]
+
+    layouts:
+      cwd: "<%= coffee.layouts.cwd %>"
+      files: "<%= coffee.layouts.src %>"
+      tasks: ["coffee:layouts", "reload"]
 
 module.exports = (grunt) ->
   ## init config 
   grunt.initConfig gruntConfig
 
-  grunt.loadNpmTasks "grunt-contrib-watch"
   grunt.loadNpmTasks "grunt-contrib-copy"
   grunt.loadNpmTasks "grunt-contrib-coffee"
-  grunt.loadNpmTasks "grunt-contrib-connect"
   grunt.loadNpmTasks "grunt-contrib-clean"
   grunt.loadNpmTasks "grunt-jaded"
   grunt.loadNpmTasks "grunt-reload"
+  grunt.loadNpmTasks "grunt-regarde"
 
   ## default 
   grunt.registerTask "default", ["clean",
     "copy","coffee",
     "jaded","start",
-    "reload","watch"]
+    "reload","regarde"]
 
   ## start
   grunt.registerTask "start", "start up servers", ->
