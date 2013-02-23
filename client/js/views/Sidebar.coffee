@@ -1,4 +1,4 @@
-define ["templates/sidebar"], (templ) ->
+define ["templates/sidebar", "models/Me"], (templ, me) ->
   class Sidebar extends dermis.View
     className: "sidebar-view"
     template: templ
@@ -12,10 +12,8 @@ define ["templates/sidebar"], (templ) ->
       @$el.html @template loggedIn: loggedIn
 
       if loggedIn
-        singly.get "/profile", (err, res) =>
-          return console.log err if err
-          console.log res.body
-          @bind me: res.body
+        @bind me: me
+        me.fetch()
 
       dermis.channel.on "sidebar.user", (id) =>
         @$(".active").removeClass "active"
