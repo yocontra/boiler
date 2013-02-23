@@ -1,10 +1,10 @@
-define ["app/server", "app/channel", "templates/notFound"], (server, channel, templ) ->
+define ["app/server", "templates/notFound"], (server, templ) ->
   class NotFound extends dermis.View
     className: "notFound-view"
     template: templ
     render: ->
       @$el.html @template()
-      channel.emit "404.rendered"
+      dermis.channel.emit "404.rendered"
       return @
 
   return NotFound

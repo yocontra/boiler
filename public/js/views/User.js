@@ -1,7 +1,7 @@
 var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-define(["app/server", "app/channel", "templates/user"], function(server, channel, templ) {
+define(["app/server", "templates/user"], function(server, templ) {
   var User;
   User = (function(_super) {
 
@@ -21,8 +21,8 @@ define(["app/server", "app/channel", "templates/user"], function(server, channel
       this.$el.html(this.template({
         id: id
       }));
-      channel.emit("user.rendered");
-      channel.emit("sidebar.user", id);
+      dermis.channel.emit("sidebar.user", id);
+      dermis.channel.emit("user.rendered");
       return this;
     };
 

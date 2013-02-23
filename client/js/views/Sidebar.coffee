@@ -1,16 +1,16 @@
-define ["app/server", "app/channel", "templates/sidebar"], (server, channel, templ) ->
+define ["app/server", "templates/sidebar"], (server, templ) ->
   class Sidebar extends dermis.View
     className: "sidebar-view"
     template: templ
     render: ->
       @$el.html @template()
-      channel.on "sidebar.user", (id) =>
+      dermis.channel.on "sidebar.user", (id) =>
         @$(".active").removeClass "active"
         @$("li[data-user='#{id}']").addClass "active"
-      channel.on "sidebar.page", (page) =>
+      dermis.channel.on "sidebar.page", (page) =>
         @$(".active").removeClass "active"
         @$("li[data-page='#{page}']").addClass "active"
-      channel.emit "sidebar.rendered"
+      dermis.channel.emit "sidebar.rendered"
       return @
 
   return Sidebar

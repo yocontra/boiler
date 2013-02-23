@@ -1,7 +1,7 @@
 var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-define(["app/server", "app/channel", "templates/index"], function(server, channel, templ) {
+define(["app/server", "templates/index"], function(server, templ) {
   var Index;
   Index = (function(_super) {
 
@@ -17,13 +17,13 @@ define(["app/server", "app/channel", "templates/index"], function(server, channe
 
     Index.prototype.render = function() {
       var _this = this;
-      channel.emit("sidebar.page", "index");
+      dermis.channel.emit("sidebar.page", "index");
       server.ready(function() {
         return server.example(function(msg) {
           _this.$el.html(_this.template({
             message: msg
           }));
-          return channel.emit("index.rendered");
+          return dermis.channel.emit("index.rendered");
         });
       });
       return this;

@@ -1,7 +1,7 @@
 var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-define(["app/server", "app/channel", "templates/notFound"], function(server, channel, templ) {
+define(["app/server", "templates/notFound"], function(server, templ) {
   var NotFound;
   NotFound = (function(_super) {
 
@@ -17,7 +17,7 @@ define(["app/server", "app/channel", "templates/notFound"], function(server, cha
 
     NotFound.prototype.render = function() {
       this.$el.html(this.template());
-      channel.emit("404.rendered");
+      dermis.channel.emit("404.rendered");
       return this;
     };
 

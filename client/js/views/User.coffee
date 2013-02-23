@@ -1,11 +1,11 @@
-define ["app/server", "app/channel", "templates/user"], (server, channel, templ) ->
+define ["app/server", "templates/user"], (server, templ) ->
   class User extends dermis.View
     className: "user-view"
     template: templ
     render: ({id}) ->
       @$el.html @template id: id
-      channel.emit "user.rendered"
-      channel.emit "sidebar.user", id
+      dermis.channel.emit "sidebar.user", id
+      dermis.channel.emit "user.rendered"
       return @
 
   return User
