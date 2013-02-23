@@ -7,6 +7,10 @@ config = require './config'
 pubdir = join __dirname, '../public'
 
 app = express()
+#app.use express.logger()
+app.use express.compress()
+app.use express.methodOverride()
+app.use express.bodyParser()
 app.use express.static pubdir
 
 server = http.createServer(app).listen config.port
