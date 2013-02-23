@@ -1,4 +1,4 @@
-define ["app/server", "templates/notFound"], (server, templ) ->
+define ["templates/notFound"], (templ) ->
   class NotFound extends dermis.View
     className: "notFound-view"
     template: templ

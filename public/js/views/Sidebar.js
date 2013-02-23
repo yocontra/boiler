@@ -1,7 +1,7 @@
 var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-define(["app/server", "templates/sidebar"], function(server, templ) {
+define(["templates/sidebar"], function(templ) {
   var Sidebar;
   Sidebar = (function(_super) {
 
@@ -15,9 +15,31 @@ define(["app/server", "templates/sidebar"], function(server, templ) {
 
     Sidebar.prototype.template = templ;
 
+    Sidebar.prototype.events = {
+      "click .logout": function() {
+        singly.clearToken();
+        return window.location.href = "/";
+      }
+    };
+
     Sidebar.prototype.render = function() {
-      var _this = this;
-      this.$el.html(this.template());
+      var loggedIn,
+        _this = this;
+      loggedIn = singly.token() != null;
+      this.$el.html(this.template({
+        loggedIn: loggedIn
+      }));
+      if (loggedIn) {
+        singly.get("/profile", function(err, res) {
+          if (err) {
+            return console.log(err);
+          }
+          console.log(res.body);
+          return _this.bind({
+            me: res.body
+          });
+        });
+      }
       dermis.channel.on("sidebar.user", function(id) {
         _this.$(".active").removeClass("active");
         return _this.$("li[data-user='" + id + "']").addClass("active");

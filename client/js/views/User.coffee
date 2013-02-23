@@ -1,4 +1,4 @@
-define ["app/server", "templates/user"], (server, templ) ->
+define ["templates/user"], (templ) ->
   class User extends dermis.View
     className: "user-view"
     template: templ

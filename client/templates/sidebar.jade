@@ -1,5 +1,12 @@
 .sidebar-nav
   ul.nav.nav-list
+    if loggedIn
+      img(height="25",width="25",data-src="me:thumbnail_url")
+      &nbsp;
+      span(data-text="me:name")
+      br
+      br
+
     li(data-page="index")
       a(href="/") Home
     li.nav-header Users
@@ -9,3 +16,8 @@
       a(href="/user/2") User 2
     li(data-user="3")
       a(href="/user/3") User 3
+
+    if loggedIn
+      li.divider
+      li.logout
+        a(href="#") Logout

@@ -1,6 +1,6 @@
 
-define(["layouts/App", "views/Index", "views/Sidebar", "views/User", "views/NotFound"], function(appLayout, Index, Sidebar, User, NotFound) {
-  var doSidebar;
+define(["layouts/App", "views/Index", "views/Sidebar", "views/User", "views/NotFound", "views/Login"], function(appLayout, Index, Sidebar, User, NotFound, Login) {
+  var checkAuth, doSidebar;
   doSidebar = function() {
     var sidevu;
     if (appLayout.get("sidebar") instanceof Sidebar) {
@@ -9,6 +9,15 @@ define(["layouts/App", "views/Index", "views/Sidebar", "views/User", "views/NotF
     sidevu = new Sidebar;
     appLayout.set("sidebar", sidevu);
     return appLayout.show("sidebar");
+  };
+  checkAuth = function() {
+    var vu;
+    if (singly.token()) {
+      return true;
+    }
+    vu = new Login;
+    $('body').html(vu.render().el);
+    return false;
   };
   dermis.router.add({
     "/": function(ctx) {
@@ -20,6 +29,9 @@ define(["layouts/App", "views/Index", "views/Sidebar", "views/User", "views/NotF
     },
     "/user/:id": function(ctx) {
       var vu;
+      if (!checkAuth()) {
+        return;
+      }
       doSidebar();
       vu = new User;
       appLayout.set("main", vu);
