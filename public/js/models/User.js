@@ -17,9 +17,11 @@ define(function() {
     };
 
     User.prototype.setStatic = function() {
-      this.set('profileImage', this.profileImage());
-      this.set('profileImageLarge', this.profileImageLarge());
-      this.set('profileUrl', "/user/" + (this.get('handle')));
+      if (this.get('handle')) {
+        this.set('profileImage', this.profileImage());
+        this.set('profileImageLarge', this.profileImageLarge());
+        this.set('profileUrl', "/user/" + (this.get('handle')));
+      }
       return this;
     };
 

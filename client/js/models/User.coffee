@@ -6,9 +6,10 @@ define ->
 
     url: -> "/v1/users/#{@get('handle')}"
     setStatic: ->
-      @set 'profileImage', @profileImage()
-      @set 'profileImageLarge', @profileImageLarge()
-      @set 'profileUrl', "/user/#{@get('handle')}"
+      if @get 'handle'
+        @set 'profileImage', @profileImage()
+        @set 'profileImageLarge', @profileImageLarge()
+        @set 'profileUrl', "/user/#{@get('handle')}"
       return @
       
     fetch: ->
