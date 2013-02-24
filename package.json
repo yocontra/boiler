@@ -6,6 +6,7 @@
     "express":"*",
     "mongoose": "*",
     "async": "*",
+    "request": "*",
     "require-dir": "*"
   },
   "devDependencies": {
