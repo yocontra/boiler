@@ -1103,6 +1103,10 @@ require.register("wearefractal-mixer/dist/main.js", function(exports, require, m
       return this;
     };
 
+    Module.prototype.toJSON = function() {
+      return this._;
+    };
+
     return Module;
 
   })(EventEmitter);
@@ -1661,14 +1665,17 @@ require.register("dermis/dist/rivetsConfig.js", function(exports, require, modul
     adapter: {
       subscribe: function(obj, kp, cb) {
         if (obj._isCollection) {
+          if (kp === "") {
+            kp = "models";
+          }
           obj.on("add", function() {
-            return cb[kp];
+            return cb(obj[kp]);
           });
           obj.on("remove", function() {
-            return cb[kp];
+            return cb(obj[kp]);
           });
           obj.on("reset", function() {
-            return cb[kp];
+            return cb(obj[kp]);
           });
         } else {
           kp = (kp === "" ? "change" : "change:" + kp);
@@ -1677,14 +1684,17 @@ require.register("dermis/dist/rivetsConfig.js", function(exports, require, modul
       },
       unsubscribe: function(obj, kp, cb) {
         if (obj._isCollection) {
+          if (kp === "") {
+            kp = "models";
+          }
           obj.removeListener("add", function() {
-            return cb[kp];
+            return cb(obj[kp]);
           });
           obj.removeListener("remove", function() {
-            return cb[kp];
+            return cb(obj[kp]);
           });
           obj.removeListener("reset", function() {
-            return cb[kp];
+            return cb(obj[kp]);
           });
         } else {
           kp = (kp === "" ? "change" : "change:" + kp);
@@ -1693,6 +1703,9 @@ require.register("dermis/dist/rivetsConfig.js", function(exports, require, modul
       },
       read: function(obj, kp) {
         if (obj._isCollection) {
+          if (kp === "") {
+            kp = "models";
+          }
           return obj[kp];
         } else {
           return obj.get(kp);
@@ -1700,6 +1713,9 @@ require.register("dermis/dist/rivetsConfig.js", function(exports, require, modul
       },
       publish: function(obj, kp, val) {
         if (obj._isCollection) {
+          if (kp === "") {
+            kp = "models";
+          }
           obj[kp] = val;
         } else {
           obj.set(kp, val);
@@ -1767,13 +1783,11 @@ require.register("dermis/dist/Collection.js", function(exports, require, module)
 
     __extends(Collection, _super);
 
-    function Collection() {
-      return Collection.__super__.constructor.apply(this, arguments);
-    }
-
     Collection.prototype.model = Model;
 
-    Collection.prototype.models = [];
+    function Collection() {
+      this.models = [];
+    }
 
     Collection.prototype._isCollection = true;
 
@@ -2307,7 +2321,7 @@ require.alias("dermis/dist/dermis.js", "dermis/index.js");
 if (typeof exports == "object") {
   module.exports = require("dermis");
 } else if (typeof define == "function" && define.amd) {
-  define(function(){ return require("dermis"); });
+  define(require("dermis"));
 } else {
   window["dermis"] = require("dermis");
 }})();

@@ -1,5 +1,5 @@
 
-define(["layouts/App", "views/Index", "views/Sidebar", "views/User", "views/NotFound", "views/Login"], function(appLayout, Index, Sidebar, User, NotFound, Login) {
+define(["layouts/App", "views/Index", "views/Sidebar", "views/User", "views/NotFound", "views/Login", "views/Users"], function(appLayout, Index, Sidebar, User, NotFound, Login, Users) {
   var checkAuth, doSidebar;
   doSidebar = function() {
     var sidevu;
@@ -27,13 +27,23 @@ define(["layouts/App", "views/Index", "views/Sidebar", "views/User", "views/NotF
       appLayout.set("main", vu);
       return appLayout.show("main");
     },
-    "/user/:id": function(ctx) {
+    "/user/:handle": function(ctx) {
       var vu;
       if (!checkAuth()) {
         return;
       }
       doSidebar();
       vu = new User;
+      appLayout.set("main", vu);
+      return appLayout.show("main", ctx.params);
+    },
+    "/users": function(ctx) {
+      var vu;
+      if (!checkAuth()) {
+        return;
+      }
+      doSidebar();
+      vu = new Users;
       appLayout.set("main", vu);
       return appLayout.show("main", ctx.params);
     },

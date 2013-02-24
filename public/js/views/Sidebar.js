@@ -18,6 +18,7 @@ define(["templates/sidebar", "models/Me"], function(templ, me) {
     Sidebar.prototype.events = {
       "click .logout": function() {
         singly.clearToken();
+        dermis.router.stop();
         return window.location.href = "/";
       }
     };
@@ -35,10 +36,6 @@ define(["templates/sidebar", "models/Me"], function(templ, me) {
         });
         me.fetch();
       }
-      dermis.channel.on("sidebar.user", function(id) {
-        _this.$(".active").removeClass("active");
-        return _this.$("li[data-user='" + id + "']").addClass("active");
-      });
       dermis.channel.on("sidebar.page", function(page) {
         _this.$(".active").removeClass("active");
         return _this.$("li[data-page='" + page + "']").addClass("active");

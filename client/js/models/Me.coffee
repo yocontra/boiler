@@ -1,9 +1,4 @@
-define ->
-  class Me extends dermis.Model
-    fetch: ->
-      singly.get "/profile", (err, res) =>
-        return console.log err if err?
-        @set res.body
-
-  # There is only one of us
+define ["models/User"], (User) ->
+  class Me extends User
+    url: -> "/v1/users/me"
   return new Me

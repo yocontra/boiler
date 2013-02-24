@@ -1,7 +1,8 @@
 define ["layouts/App","views/Index", 
   "views/Sidebar", "views/User",
-  "views/NotFound", "views/Login"], 
-(appLayout, Index, Sidebar, User, NotFound, Login) ->
+  "views/NotFound", "views/Login",
+  "views/Users"], 
+(appLayout, Index, Sidebar, User, NotFound, Login, Users) ->
   doSidebar = ->
     return if appLayout.get("sidebar") instanceof Sidebar
     sidevu = new Sidebar
@@ -21,10 +22,17 @@ define ["layouts/App","views/Index",
       appLayout.set "main", vu
       appLayout.show "main"
 
-    "/user/:id": (ctx) ->
+    "/user/:handle": (ctx) ->
       return unless checkAuth()
       doSidebar()
       vu = new User
+      appLayout.set "main", vu
+      appLayout.show "main", ctx.params
+
+    "/users": (ctx) ->
+      return unless checkAuth()
+      doSidebar()
+      vu = new Users
       appLayout.set "main", vu
       appLayout.show "main", ctx.params
 

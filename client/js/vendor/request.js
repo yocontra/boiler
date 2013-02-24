@@ -70,7 +70,6 @@ require.aliases = {};
  */
 
 require.resolve = function(path) {
-  if (path.charAt(0) === '/') path = path.slice(1);
   var index = path + '/index.js';
 
   var paths = [
@@ -183,18 +182,17 @@ require.relative = function(parent) {
    */
 
   localRequire.resolve = function(path) {
-    var c = path.charAt(0);
-    if ('/' == c) return path.slice(1);
-    if ('.' == c) return require.normalize(p, path);
-
     // resolve deps by returning
     // the dep in the nearest "deps"
     // directory
-    var segs = parent.split('/');
-    var i = lastIndexOf(segs, 'deps') + 1;
-    if (!i) i = 0;
-    path = segs.slice(0, i + 1).join('/') + '/deps/' + path;
-    return path;
+    if ('.' != path.charAt(0)) {
+      var segs = parent.split('/');
+      var i = lastIndexOf(segs, 'deps') + 1;
+      if (!i) i = 0;
+      path = segs.slice(0, i + 1).join('/') + '/deps/' + path;
+      return path;
+    }
+    return require.normalize(p, path);
   };
 
   /**
@@ -207,112 +205,6 @@ require.relative = function(parent) {
 
   return localRequire;
 };
-require.register("component-cookie/index.js", function(exports, require, module){
-/**
- * Encode.
- */
-
-var encode = encodeURIComponent;
-
-/**
- * Decode.
- */
-
-var decode = decodeURIComponent;
-
-/**
- * Set or get cookie `name` with `value` and `options` object.
- *
- * @param {String} name
- * @param {String} value
- * @param {Object} options
- * @return {Mixed}
- * @api public
- */
-
-module.exports = function(name, value, options){
-  switch (arguments.length) {
-    case 3:
-    case 2:
-      return set(name, value, options);
-    case 1:
-      return get(name);
-    default:
-      return all();
-  }
-};
-
-/**
- * Set cookie `name` to `value`.
- *
- * @param {String} name
- * @param {String} value
- * @param {Object} options
- * @api private
- */
-
-function set(name, value, options) {
-  options = options || {};
-  var str = encode(name) + '=' + encode(value);
-
-  if (null == value) options.maxage = -1;
-
-  if (options.maxage) {
-    options.expires = new Date(+new Date + options.maxage);
-  }
-
-  if (options.path) str += '; path=' + options.path;
-  if (options.domain) str += '; domain=' + options.domain;
-  if (options.expires) str += '; expires=' + options.expires.toUTCString();
-  if (options.secure) str += '; secure';
-
-  document.cookie = str;
-}
-
-/**
- * Return all cookies.
- *
- * @return {Object}
- * @api private
- */
-
-function all() {
-  return parse(document.cookie);
-}
-
-/**
- * Get cookie `name`.
- *
- * @param {String} name
- * @return {String}
- * @api private
- */
-
-function get(name) {
-  return all()[name];
-}
-
-/**
- * Parse cookie `str`.
- *
- * @param {String} str
- * @return {Object}
- * @api private
- */
-
-function parse(str) {
-  var obj = {};
-  var pairs = str.split(/ *; */);
-  var pair;
-  if ('' == pairs[0]) return obj;
-  for (var i = 0; i < pairs.length; ++i) {
-    pair = pairs[i].split('=');
-    obj[decode(pair[0])] = decode(pair[1]);
-  }
-  return obj;
-}
-
-});
 require.register("component-emitter/index.js", function(exports, require, module){
 
 /**
@@ -323,7 +215,7 @@ module.exports = Emitter;
 
 /**
  * Initialize a new `Emitter`.
- *
+ * 
  * @api public
  */
 
@@ -396,9 +288,7 @@ Emitter.prototype.once = function(event, fn){
  * @api public
  */
 
-Emitter.prototype.off =
-Emitter.prototype.removeListener =
-Emitter.prototype.removeAllListeners = function(event, fn){
+Emitter.prototype.off = function(event, fn){
   this._callbacks = this._callbacks || {};
   var callbacks = this._callbacks[event];
   if (!callbacks) return this;
@@ -420,7 +310,7 @@ Emitter.prototype.removeAllListeners = function(event, fn){
  *
  * @param {String} event
  * @param {Mixed} ...
- * @return {Emitter}
+ * @return {Emitter} 
  */
 
 Emitter.prototype.emit = function(event){
@@ -463,6 +353,7 @@ Emitter.prototype.hasListeners = function(event){
   return !! this.listeners(event).length;
 };
 
+
 });
 require.register("RedVentures-reduce/index.js", function(exports, require, module){
 
@@ -490,7 +381,7 @@ module.exports = function(arr, fn, initial){
   return curr;
 };
 });
-require.register("visionmedia-superagent/lib/client.js", function(exports, require, module){
+require.register("superagent/lib/client.js", function(exports, require, module){
 
 /**
  * Module dependencies.
@@ -762,26 +653,10 @@ function Response(xhr, options) {
   this.xhr = xhr;
   this.text = xhr.responseText;
   this.setStatusProperties(xhr.status);
-  this.header = this.headers = parseHeader(xhr.getAllResponseHeaders());
-  // getAllResponseHeaders sometimes falsely returns "" for CORS requests, but
-  // getResponseHeader still works. so we get content-type even if getting
-  // other headers fails.
-  this.header['content-type'] = xhr.getResponseHeader('content-type');
+  this.header = parseHeader(xhr.getAllResponseHeaders());
   this.setHeaderProperties(this.header);
   this.body = this.parseBody(this.text);
 }
-
-/**
- * Get case-insensitive `field` value.
- *
- * @param {String} field
- * @return {String}
- * @api public
- */
-
-Response.prototype.get = function(field){
-  return this.header[field.toLowerCase()];
-};
 
 /**
  * Set header related properties:
@@ -1390,114 +1265,16 @@ request.put = function(url, data, fn){
 module.exports = request;
 
 });
-require.register("singly/dist/singly.js", function(exports, require, module){
-// Generated by CoffeeScript 1.4.0
-var apiKey, cookie, getParam, request, singly, tok;
+require.alias("component-emitter/index.js", "superagent/deps/emitter/index.js");
 
-cookie = require('cookie');
+require.alias("RedVentures-reduce/index.js", "superagent/deps/reduce/index.js");
 
-request = require('superagent');
-
-getParam = function(param) {
-  var match, re, url;
-  url = window.location.hash;
-  re = new RegExp("#" + param + "=([^&]+)(&|$)");
-  match = url.match(re);
-  if (!((match != null) && (match[1] != null))) {
-    return;
-  }
-  return match[1];
-};
-
-apiKey = null;
-
-singly = {
-  base: "https://api.singly.com",
-  cookieName: "singly_access_token",
-  setKey: function(key) {
-    return apiKey = key;
-  },
-  token: function() {
-    return cookie(singly.cookieName);
-  },
-  clearToken: function() {
-    cookie(singly.cookieName, null);
-    return singly;
-  },
-  setToken: function(val) {
-    cookie(singly.cookieName, val, {
-      maxage: 604800000,
-      path: '/'
-    });
-    return singly;
-  },
-  authorize: function(service, cburl) {
-    var uri;
-    if (cburl == null) {
-      cburl = window.location.href;
-    }
-    uri = "" + singly.base + "/oauth/authorize?client_id=" + apiKey + "&service=" + service + "&redirect_uri=" + cburl + "&scope=email&response_type=token";
-    window.location.href = uri;
-    return singly;
-  },
-  makeRequest: function(path, opt, type, cb) {
-    var req, uri;
-    if (opt == null) {
-      opt = {};
-    }
-    if (typeof opt === 'function' && !cb) {
-      cb = opt;
-      opt = {};
-    }
-    uri = "" + singly.base + path;
-    req = request[type](uri).type('json').query(opt.qs).query({
-      access_token: singly.token()
-    });
-    if (type === 'post' || type === 'put') {
-      req.send(opt.data);
-    }
-    req.end(cb);
-    return req;
-  },
-  get: function(path, opt, cb) {
-    return singly.makeRequest(path, opt, 'get', cb);
-  },
-  post: function(path, opt, cb) {
-    return singly.makeRequest(path, opt, 'post', cb);
-  },
-  put: function(path, opt, cb) {
-    return singly.makeRequest(path, opt, 'put', cb);
-  },
-  del: function(path, opt, cb) {
-    return singly.makeRequest(path, opt, 'del', cb);
-  }
-};
-
-tok = getParam("access_token");
-
-if (tok != null) {
-  singly.setToken(tok);
-}
-
-module.exports = singly;
-
-});
-require.alias("component-cookie/index.js", "singly/deps/cookie/index.js");
-
-require.alias("visionmedia-superagent/lib/client.js", "singly/deps/superagent/lib/client.js");
-require.alias("visionmedia-superagent/lib/client.js", "singly/deps/superagent/index.js");
-require.alias("component-emitter/index.js", "visionmedia-superagent/deps/emitter/index.js");
-
-require.alias("RedVentures-reduce/index.js", "visionmedia-superagent/deps/reduce/index.js");
-
-require.alias("visionmedia-superagent/lib/client.js", "visionmedia-superagent/index.js");
-
-require.alias("singly/dist/singly.js", "singly/index.js");
+require.alias("superagent/lib/client.js", "superagent/index.js");
 
 if (typeof exports == "object") {
-  module.exports = require("singly");
+  module.exports = require("superagent");
 } else if (typeof define == "function" && define.amd) {
-  define(require("singly"));
+  define(require("superagent"));
 } else {
-  window["singly"] = require("singly");
+  window["superagent"] = require("superagent");
 }})();

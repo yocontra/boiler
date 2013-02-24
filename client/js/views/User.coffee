@@ -1,11 +1,17 @@
-define ["templates/user"], (templ) ->
-  class User extends dermis.View
+define ["templates/user", "models/User"], (templ, User) ->
+  class UserView extends dermis.View
     className: "user-view"
     template: templ
-    render: ({id}) ->
-      @$el.html @template id: id
-      dermis.channel.emit "sidebar.user", id
+    render: ({handle}) ->
+      @$el.html @template()
+      
+      user = new User handle: handle
+      user.fetch()
+
+      @bind user
+
+      dermis.channel.emit "sidebar.page", "users"
       dermis.channel.emit "user.rendered"
       return @
 
-  return User
+  return UserView

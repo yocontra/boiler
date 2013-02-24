@@ -1,21 +1,17 @@
 .sidebar-nav
   ul.nav.nav-list
     if loggedIn
-      img.img-rounded(height="30",width="30",data-src="me.thumbnail_url")
+      img.img-rounded(width="30",data-src="me.profileImage")
       &nbsp;
-      span(data-text="me.name")
+      span(data-text="me.handle")
       br
       br
 
     li(data-page="index")
       a(href="/") Home
-    li.nav-header Users
-    li(data-user="1")
-      a(href="/user/1") User 1
-    li(data-user="2")
-      a(href="/user/2") User 2
-    li(data-user="3")
-      a(href="/user/3") User 3
+
+    li(data-page="users")
+      a(href="/users/") Users
 
     if loggedIn
       li.divider
