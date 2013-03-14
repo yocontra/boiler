@@ -4,10 +4,9 @@ define ["layouts/App","views/Index",
   "views/Users"], 
 (appLayout, Index, Sidebar, User, NotFound, Login, Users) ->
   doSidebar = ->
-    return if appLayout.get("sidebar") instanceof Sidebar
+    return if appLayout.region("sidebar").view instanceof Sidebar
     sidevu = new Sidebar
-    appLayout.set "sidebar", sidevu
-    appLayout.show "sidebar"
+    appLayout.region("sidebar").set(sidevu).show()
 
   checkAuth = ->
     return true if singly.token()
@@ -19,26 +18,22 @@ define ["layouts/App","views/Index",
     "/": (ctx) ->
       doSidebar()
       vu = new Index
-      appLayout.set "main", vu
-      appLayout.show "main"
+      appLayout.region("main").set(vu).show()
 
     "/user/:handle": (ctx) ->
       return unless checkAuth()
       doSidebar()
       vu = new User
-      appLayout.set "main", vu
-      appLayout.show "main", ctx.params
+      appLayout.region("main").set(vu).show ctx.params
 
     "/users": (ctx) ->
       return unless checkAuth()
       doSidebar()
       vu = new Users
-      appLayout.set "main", vu
-      appLayout.show "main", ctx.params
+      appLayout.region("main").set(vu).show ctx.params
 
     "*": ->
       vu = new NotFound
-      appLayout.set "main", vu
-      appLayout.show "main"
+      appLayout.region("main").set(vu).show()
   
   return dermis.router

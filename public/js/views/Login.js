@@ -13,7 +13,7 @@ define(["templates/login"], function(templ) {
 
     Login.prototype.className = "login-view";
 
-    Login.prototype.template = templ;
+    Login.prototype.content = templ;
 
     Login.prototype.events = {
       "click .twitterLogin": "loginTwitter",
@@ -26,12 +26,6 @@ define(["templates/login"], function(templ) {
 
     Login.prototype.loginFacebook = function() {
       return singly.authorize('facebook');
-    };
-
-    Login.prototype.render = function() {
-      this.$el.html(this.template());
-      dermis.channel.emit("login.rendered");
-      return this;
     };
 
     return Login;

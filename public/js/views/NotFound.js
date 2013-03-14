@@ -13,13 +13,7 @@ define(["templates/notFound"], function(templ) {
 
     NotFound.prototype.className = "notFound-view";
 
-    NotFound.prototype.template = templ;
-
-    NotFound.prototype.render = function() {
-      this.$el.html(this.template());
-      dermis.channel.emit("404.rendered");
-      return this;
-    };
+    NotFound.prototype.content = templ;
 
     return NotFound;
 

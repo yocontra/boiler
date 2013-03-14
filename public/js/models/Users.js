@@ -13,19 +13,7 @@ define(["models/User"], function(User) {
 
     Users.prototype.model = User;
 
-    Users.prototype.url = function() {
-      return "/v1/users";
-    };
-
-    Users.prototype.fetch = function() {
-      var _this = this;
-      return request.get(this.url(), function(err, res) {
-        if (err != null) {
-          return console.log(err);
-        }
-        return _this.add(res.body);
-      });
-    };
+    Users.prototype.url = "/v1/users";
 
     return Users;
 

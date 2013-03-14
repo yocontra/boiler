@@ -11,7 +11,7 @@ define(["templates/appLayout"], function(templ) {
       return AppLayout.__super__.constructor.apply(this, arguments);
     }
 
-    AppLayout.prototype.template = templ;
+    AppLayout.prototype.content = templ;
 
     AppLayout.prototype.regions = {
       "sidebar": "#sidebar",

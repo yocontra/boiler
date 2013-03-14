@@ -13,12 +13,10 @@ define(["templates/index"], function(templ) {
 
     Index.prototype.className = "index-view";
 
-    Index.prototype.template = templ;
+    Index.prototype.content = templ;
 
     Index.prototype.render = function() {
       dermis.channel.emit("sidebar.page", "index");
-      this.$el.html(this.template());
-      dermis.channel.emit("index.rendered");
       return this;
     };
 

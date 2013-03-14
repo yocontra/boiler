@@ -3,12 +3,11 @@ define(["layouts/App", "views/Index", "views/Sidebar", "views/User", "views/NotF
   var checkAuth, doSidebar;
   doSidebar = function() {
     var sidevu;
-    if (appLayout.get("sidebar") instanceof Sidebar) {
+    if (appLayout.region("sidebar").view instanceof Sidebar) {
       return;
     }
     sidevu = new Sidebar;
-    appLayout.set("sidebar", sidevu);
-    return appLayout.show("sidebar");
+    return appLayout.region("sidebar").set(sidevu).show();
   };
   checkAuth = function() {
     var vu;
@@ -24,8 +23,7 @@ define(["layouts/App", "views/Index", "views/Sidebar", "views/User", "views/NotF
       var vu;
       doSidebar();
       vu = new Index;
-      appLayout.set("main", vu);
-      return appLayout.show("main");
+      return appLayout.region("main").set(vu).show();
     },
     "/user/:handle": function(ctx) {
       var vu;
@@ -34,8 +32,7 @@ define(["layouts/App", "views/Index", "views/Sidebar", "views/User", "views/NotF
       }
       doSidebar();
       vu = new User;
-      appLayout.set("main", vu);
-      return appLayout.show("main", ctx.params);
+      return appLayout.region("main").set(vu).show(ctx.params);
     },
     "/users": function(ctx) {
       var vu;
@@ -44,14 +41,12 @@ define(["layouts/App", "views/Index", "views/Sidebar", "views/User", "views/NotF
       }
       doSidebar();
       vu = new Users;
-      appLayout.set("main", vu);
-      return appLayout.show("main", ctx.params);
+      return appLayout.region("main").set(vu).show(ctx.params);
     },
     "*": function() {
       var vu;
       vu = new NotFound;
-      appLayout.set("main", vu);
-      return appLayout.show("main");
+      return appLayout.region("main").set(vu).show();
     }
   });
   return dermis.router;

@@ -13,19 +13,17 @@ define(["templates/user", "models/User"], function(templ, User) {
 
     UserView.prototype.className = "user-view";
 
-    UserView.prototype.template = templ;
+    UserView.prototype.content = templ;
 
     UserView.prototype.render = function(_arg) {
       var handle, user;
       handle = _arg.handle;
-      this.$el.html(this.template());
       user = new User({
         handle: handle
       });
       user.fetch();
       this.bind(user);
       dermis.channel.emit("sidebar.page", "users");
-      dermis.channel.emit("user.rendered");
       return this;
     };
 

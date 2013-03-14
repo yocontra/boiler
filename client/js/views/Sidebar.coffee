@@ -1,16 +1,17 @@
 define ["templates/sidebar", "models/Me"], (templ, me) ->
   class Sidebar extends dermis.View
     className: "sidebar-view"
-    template: templ
     events:
-      "click .logout": ->
-        singly.clearToken()
-        dermis.router.stop()
-        window.location.href = "/"
+      "click .logout": "logout"
+
+    logout: =>
+      singly.clearToken()
+      @$el.html templ loggedIn: false
+      window.location.href = "/"
 
     render: ->
       loggedIn = singly.token()?
-      @$el.html @template loggedIn: loggedIn
+      @$el.html templ loggedIn: loggedIn
 
       if loggedIn
         @bind me: me

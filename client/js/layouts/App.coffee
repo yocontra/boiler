@@ -1,6 +1,6 @@
 define ["templates/appLayout"], (templ) ->
   class AppLayout extends dermis.Layout
-    template: templ
+    content: templ
     regions:
       "sidebar": "#sidebar"
       "main": "#main"

@@ -8,32 +8,11 @@ define(function() {
     __extends(User, _super);
 
     function User() {
-      User.__super__.constructor.apply(this, arguments);
-      this.setStatic();
+      return User.__super__.constructor.apply(this, arguments);
     }
 
     User.prototype.url = function() {
       return "/v1/users/" + (this.get('handle'));
-    };
-
-    User.prototype.setStatic = function() {
-      if (this.get('handle')) {
-        this.set('profileImage', this.profileImage());
-        this.set('profileImageLarge', this.profileImageLarge());
-        this.set('profileUrl', "/user/" + (this.get('handle')));
-      }
-      return this;
-    };
-
-    User.prototype.fetch = function() {
-      var _this = this;
-      return request.get(this.url(), function(err, res) {
-        if (err != null) {
-          return console.log(err);
-        }
-        _this.set(res.body);
-        return _this.setStatic();
-      });
     };
 
     User.prototype.profileImage = function() {

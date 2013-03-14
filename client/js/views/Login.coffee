@@ -1,7 +1,7 @@
 define ["templates/login"], (templ) ->
   class Login extends dermis.View
     className: "login-view"
-    template: templ
+    content: templ
     events:
       "click .twitterLogin": "loginTwitter"
       "click .facebookLogin": "loginFacebook"
@@ -11,10 +11,5 @@ define ["templates/login"], (templ) ->
 
     loginFacebook: ->
       singly.authorize 'facebook'
-
-    render: ->
-      @$el.html @template()
-      dermis.channel.emit "login.rendered"
-      return @
 
   return Login
