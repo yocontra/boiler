@@ -207,7 +207,25 @@ require.relative = function(parent) {
 
   return localRequire;
 };
+require.register("component-indexof/index.js", function(exports, require, module){
+
+var indexOf = [].indexOf;
+
+module.exports = function(arr, obj){
+  if (indexOf) return arr.indexOf(obj);
+  for (var i = 0; i < arr.length; ++i) {
+    if (arr[i] === obj) return i;
+  }
+  return -1;
+};
+});
 require.register("component-emitter/index.js", function(exports, require, module){
+
+/**
+ * Module dependencies.
+ */
+
+var index = require('indexof');
 
 /**
  * Expose `Emitter`.
@@ -312,7 +330,7 @@ Emitter.prototype.removeAllListeners = function(event, fn){
   }
 
   // remove specific handler
-  var i = callbacks.indexOf(fn._off || fn);
+  var i = index(callbacks, fn._off || fn);
   if (~i) callbacks.splice(i, 1);
   return this;
 };
@@ -1924,6 +1942,7 @@ function Request(method, url) {
   this.method = method;
   this.url = url;
   this.header = {};
+  this._header = {};
   this.set('X-Requested-With', 'XMLHttpRequest');
   this.on('end', function(){
     var res = new Response(self.xhr);
@@ -2008,8 +2027,21 @@ Request.prototype.set = function(field, val){
     }
     return this;
   }
-  this.header[field.toLowerCase()] = val;
+  this._header[field.toLowerCase()] = val;
+  this.header[field] = val;
   return this;
+};
+
+/**
+ * Get case-insensitive header `field` value.
+ *
+ * @param {String} field
+ * @return {String}
+ * @api private
+ */
+
+Request.prototype.getHeader = function(field){
+  return this._header[field.toLowerCase()];
 };
 
 /**
@@ -2112,7 +2144,7 @@ Request.prototype.query = function(val){
 
 Request.prototype.send = function(data){
   var obj = isObject(data);
-  var type = this.header['content-type'];
+  var type = this.getHeader('Content-Type');
 
   // merge
   if (obj && isObject(this._data)) {
@@ -2121,7 +2153,7 @@ Request.prototype.send = function(data){
     }
   } else if ('string' == typeof data) {
     if (!type) this.type('form');
-    type = this.header['content-type'];
+    type = this.getHeader('Content-Type');
     if ('application/x-www-form-urlencoded' == type) {
       this._data = this._data
         ? this._data + '&' + data
@@ -2227,6 +2259,14 @@ Request.prototype.end = function(fn){
     self.emit('end');
   };
 
+  // progress
+  if (xhr.upload) {
+    xhr.upload.onprogress = function(e){
+      e.percent = e.loaded / e.total * 100;
+      self.emit('progress', e);
+    };
+  }
+
   // timeout
   if (timeout && !this._timer) {
     this._timer = setTimeout(function(){
@@ -2248,12 +2288,13 @@ Request.prototype.end = function(fn){
   // body
   if ('GET' != this.method && 'HEAD' != this.method && 'string' != typeof data) {
     // serialize stuff
-    var serialize = request.serialize[this.header['content-type']];
+    var serialize = request.serialize[this.getHeader('Content-Type')];
     if (serialize) data = serialize(data);
   }
 
   // set header fields
   for (var field in this.header) {
+    if (null == this.header[field]) continue;
     xhr.setRequestHeader(field, this.header[field]);
   }
 
@@ -2409,6 +2450,247 @@ request.put = function(url, data, fn){
 module.exports = request;
 
 });
+require.register("aheckmann-mpath/lib/index.js", function(exports, require, module){
+/**
+ * Returns the value of object `o` at the given `path`.
+ *
+ * ####Example:
+ *
+ *     var obj = {
+ *         comments: [
+ *             { title: 'exciting!', _doc: { title: 'great!' }}
+ *           , { title: 'number dos' }
+ *         ]
+ *     }
+ *
+ *     mpath.get('comments.0.title', o)         // 'exciting!'
+ *     mpath.get('comments.0.title', o, '_doc') // 'great!'
+ *     mpath.get('comments.title', o)           // ['exciting!', 'number dos']
+ *
+ *     // summary
+ *     mpath.get(path, o)
+ *     mpath.get(path, o, special)
+ *     mpath.get(path, o, map)
+ *     mpath.get(path, o, special, map)
+ *
+ * @param {String} path
+ * @param {Object} o
+ * @param {String} [special] When this property name is present on any object in the path, walking will continue on the value of this property.
+ * @param {Function} [map] Optional function which receives each individual found value. The value returned from `map` is used in the original values place.
+ */
+
+exports.get = function (path, o, special, map) {
+  var lookup;
+
+  if ('function' == typeof special) {
+    if (special.length < 2) {
+      map = special;
+      special = undefined;
+    } else {
+      lookup = special;
+      special = undefined;
+    }
+  }
+
+  map || (map = K);
+
+  var parts = 'string' == typeof path
+    ? path.split('.')
+    : path
+
+  if (!Array.isArray(parts)) {
+    throw new TypeError('Invalid `path`. Must be either string or array');
+  }
+
+  var obj = o
+    , part;
+
+  for (var i = 0; i < parts.length; ++i) {
+    part = parts[i];
+
+    if (Array.isArray(obj) && !/^\d+$/.test(part)) {
+      // reading a property from the array items
+      var paths = parts.slice(i);
+
+      return obj.map(function (item) {
+        return item
+          ? exports.get(paths, item, special || lookup, map)
+          : map(undefined);
+      });
+    }
+
+    if (lookup) {
+      obj = lookup(obj, part);
+    } else {
+      obj = special && obj[special]
+        ? obj[special][part]
+        : obj[part];
+    }
+
+    if (!obj) return map(obj);
+  }
+
+  return map(obj);
+}
+
+/**
+ * Sets the `val` at the given `path` of object `o`.
+ *
+ * @param {String} path
+ * @param {Anything} val
+ * @param {Object} o
+ * @param {String} [special] When this property name is present on any object in the path, walking will continue on the value of this property.
+ * @param {Function} [map] Optional function which is passed each individual value before setting it. The value returned from `map` is used in the original values place.
+ */
+
+exports.set = function (path, val, o, special, map, _copying) {
+  var lookup;
+
+  if ('function' == typeof special) {
+    if (special.length < 2) {
+      map = special;
+      special = undefined;
+    } else {
+      lookup = special;
+      special = undefined;
+    }
+  }
+
+  map || (map = K);
+
+  var parts = 'string' == typeof path
+    ? path.split('.')
+    : path
+
+  if (!Array.isArray(parts)) {
+    throw new TypeError('Invalid `path`. Must be either string or array');
+  }
+
+  if (null == o) return;
+
+  // the existance of $ in a path tells us if the user desires
+  // the copying of an array instead of setting each value of
+  // the array to the one by one to matching positions of the
+  // current array.
+  var copy = _copying || /\$/.test(path)
+    , obj = o
+    , part
+
+  for (var i = 0, len = parts.length - 1; i < len; ++i) {
+    part = parts[i];
+
+    if ('$' == part) {
+      if (i == len - 1) {
+        break;
+      } else {
+        continue;
+      }
+    }
+
+    if (Array.isArray(obj) && !/^\d+$/.test(part)) {
+      var paths = parts.slice(i);
+      if (!copy && Array.isArray(val)) {
+        for (var j = 0; j < obj.length && j < val.length; ++j) {
+          // assignment of single values of array
+          exports.set(paths, val[j], obj[j], special || lookup, map, copy);
+        }
+      } else {
+        for (var j = 0; j < obj.length; ++j) {
+          // assignment of entire value
+          exports.set(paths, val, obj[j], special || lookup, map, copy);
+        }
+      }
+      return;
+    }
+
+    if (lookup) {
+      obj = lookup(obj, part);
+    } else {
+      obj = special && obj[special]
+        ? obj[special][part]
+        : obj[part];
+    }
+
+    if (!obj) return;
+  }
+
+  // process the last property of the path
+
+  part = parts[len];
+
+  // use the special property if exists
+  if (special && obj[special]) {
+    obj = obj[special];
+  }
+
+  // set the value on the last branch
+  if (Array.isArray(obj) && !/^\d+$/.test(part)) {
+    if (!copy && Array.isArray(val)) {
+      for (var item, j = 0; j < obj.length && j < val.length; ++j) {
+        item = obj[j];
+        if (item) {
+          if (lookup) {
+            lookup(item, part, map(val[j]));
+          } else {
+            if (item[special]) item = item[special];
+            item[part] = map(val[j]);
+          }
+        }
+      }
+    } else {
+      for (var j = 0; j < obj.length; ++j) {
+        item = obj[j];
+        if (item) {
+          if (lookup) {
+            lookup(item, part, map(val));
+          } else {
+            if (item[special]) item = item[special];
+            item[part] = map(val);
+          }
+        }
+      }
+    }
+  } else {
+    if (lookup) {
+      lookup(obj, part, map(val));
+    } else {
+      obj[part] = map(val);
+    }
+  }
+}
+
+/*!
+ * Returns the value passed to it.
+ */
+
+function K (v) {
+  return v;
+}
+
+});
+require.register("yields-prevent/index.js", function(exports, require, module){
+
+/**
+ * prevent default on the given `e`.
+ * 
+ * examples:
+ * 
+ *      anchor.onclick = prevent;
+ *      anchor.onclick = function(e){
+ *        if (something) return prevent(e);
+ *      };
+ * 
+ * @param {Event} e
+ */
+
+module.exports = function(e){
+  e = e || window.event
+  return e.preventDefault
+    ? e.preventDefault()
+    : e.returnValue = false;
+};
+
+});
 require.register("dermis/dist/delegate.js", function(exports, require, module){
 // Generated by CoffeeScript 1.6.1
 var Delegate, splitEvents;
@@ -2496,8 +2778,10 @@ module.exports = function(tagName, attributes, content) {
 });
 require.register("dermis/dist/rivetsConfig.js", function(exports, require, module){
 // Generated by CoffeeScript 1.6.1
-var cfg, k, publishers, v, _ref,
+var cfg, k, prevent, publishers, v, _ref,
   __slice = [].slice;
+
+prevent = require('prevent');
 
 cfg = {
   preloadData: true,
@@ -2574,7 +2858,7 @@ cfg = {
         return v;
       }
       return function(e) {
-        e.preventDefault();
+        prevent(e);
         v.call(this, e);
         return false;
       };
@@ -2686,9 +2970,84 @@ module.exports = {
 };
 
 });
+require.register("dermis/dist/toJSON.js", function(exports, require, module){
+// Generated by CoffeeScript 1.6.1
+var toJSON,
+  __hasProp = {}.hasOwnProperty;
+
+module.exports = toJSON = function(val) {
+  var i, k, out, v;
+  if (Array.isArray(val)) {
+    return (function() {
+      var _i, _len, _results;
+      _results = [];
+      for (_i = 0, _len = val.length; _i < _len; _i++) {
+        i = val[_i];
+        _results.push(toJSON(i));
+      }
+      return _results;
+    })();
+  } else if ((val != null) && typeof val.toJSON === 'function') {
+    return val.toJSON();
+  } else if (typeof val === "object") {
+    out = {};
+    for (k in val) {
+      if (!__hasProp.call(val, k)) continue;
+      v = val[k];
+      out[k] = toJSON(v);
+    }
+    return out;
+  }
+  return val;
+};
+
+});
+require.register("dermis/dist/modelAdapter.js", function(exports, require, module){
+// Generated by CoffeeScript 1.6.1
+var adapter;
+
+module.exports = adapter = {
+  get: function(o, k) {
+    if (o._isCollection && /^\d+$/.test(k)) {
+      return o.at(k);
+    }
+    if (o._isModel) {
+      return o.get(k);
+    }
+    return o[k];
+  },
+  set: function(silent) {
+    return function(o, k, v) {
+      if (typeof v !== 'undefined') {
+        if (v === null) {
+          return adapter.del(o, k, silent);
+        }
+        if (o._isCollection && /^\d+$/.test(k)) {
+          o.replaceAt(parseInt(k), v, silent);
+        } else if (o._isModel) {
+          o.set(k, v, silent);
+        } else {
+          o[k] = v;
+        }
+      }
+      return adapter.get(o, k);
+    };
+  },
+  del: function(o, k, silent) {
+    if (o._isCollection && /^\d+$/.test(k)) {
+      o.removeAt(parseInt(k), silent);
+    } else if (o._isModel) {
+      delete o._props[k];
+    } else {
+      delete o[k];
+    }
+  }
+};
+
+});
 require.register("dermis/dist/Model.js", function(exports, require, module){
 // Generated by CoffeeScript 1.6.1
-var Emitter, Model, rivets, syncAdapter,
+var Emitter, Model, adapter, mpath, rivets, syncAdapter, toJSON,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -2698,35 +3057,56 @@ syncAdapter = require('./syncAdapter');
 
 Emitter = require('emitter');
 
+mpath = require('mpath');
+
+adapter = require('./modelAdapter');
+
+toJSON = require('./toJSON');
+
 Model = (function(_super) {
 
   __extends(Model, _super);
 
+  Model._isModel = true;
+
+  Model.prototype._isModel = true;
+
   Model.prototype.sync = syncAdapter;
+
+  Model.prototype.casts = null;
 
   Model.prototype.casts = null;
 
   Model.prototype.defaults = null;
 
   function Model(o) {
-    var _ref;
+    var _ref, _ref1;
     this._fetched = false;
     this._props = {};
     if ((_ref = this.casts) == null) {
       this.casts = {};
     }
+    if ((_ref1 = this.accessors) == null) {
+      this.accessors = {};
+    }
     if (this.defaults != null) {
       this.set(this.defaults);
     }
-    this.set(o);
+    if (!Array.isArray(o)) {
+      this.set(o);
+    }
   }
 
   Model.prototype.get = function(k) {
-    return this._props[k];
+    var _ref;
+    if ((_ref = this.accessors[k]) != null ? _ref.get : void 0) {
+      return this.accessors[k].get();
+    }
+    return mpath.get(k, this._props, adapter.get);
   };
 
   Model.prototype.set = function(k, v, silent) {
-    var castModel, ky, vy;
+    var castModel, ky, vy, _ref;
     if (k == null) {
       return;
     }
@@ -2740,9 +3120,17 @@ Model = (function(_super) {
     } else {
       castModel = this.casts[k];
       if (castModel != null) {
-        v = new castModel(v);
+        if (castModel._isModel) {
+          v = new castModel(v);
+        } else {
+          v = castModel(v);
+        }
       }
-      this._props[k] = v;
+      if ((_ref = this.accessors[k]) != null ? _ref.set : void 0) {
+        this.accessors[k].set(v);
+      } else {
+        mpath.set(k, v, this._props, adapter.set(silent));
+      }
       if (!silent) {
         this.emit("change", k, v);
         this.emit("change:" + k, v);
@@ -2755,6 +3143,7 @@ Model = (function(_super) {
     var k, v, _ref;
     _ref = this._props;
     for (k in _ref) {
+      if (!__hasProp.call(_ref, k)) continue;
       v = _ref[k];
       this.remove(k, silent);
     }
@@ -2762,11 +3151,11 @@ Model = (function(_super) {
   };
 
   Model.prototype.has = function(k) {
-    return this._props[k] != null;
+    return this.get(k) != null;
   };
 
   Model.prototype.remove = function(k, silent) {
-    delete this._props[k];
+    this.set(k, null, true);
     if (!silent) {
       this.emit("change", k);
       this.emit("change:" + k);
@@ -2777,7 +3166,7 @@ Model = (function(_super) {
   };
 
   Model.prototype.toJSON = function() {
-    return this._props;
+    return toJSON(this._props);
   };
 
   Model.prototype.fetch = function(opt, cb) {
@@ -2798,8 +3187,8 @@ Model = (function(_super) {
       if (typeof res.body === 'object') {
         _this.set(res.body);
       }
-      _this.emit("fetched", res);
       _this._fetched = true;
+      _this.emit("fetched", res);
       if (cb) {
         return cb(err, res);
       }
@@ -2915,6 +3304,10 @@ Collection = (function(_super) {
 
   __extends(Collection, _super);
 
+  Collection._isCollection = true;
+
+  Collection.prototype._isCollection = true;
+
   function Collection(items) {
     Collection.__super__.constructor.apply(this, arguments);
     if (!this.has('models')) {
@@ -2936,11 +3329,7 @@ Collection = (function(_super) {
       }
       return this;
     }
-    if (this.model && !(o instanceof Model)) {
-      mod = new this.model(o);
-    } else {
-      mod = o;
-    }
+    mod = this._processModel(o);
     this.get('models').push(mod);
     this.set('models', this.get('models'), silent);
     if (!silent) {
@@ -2971,6 +3360,23 @@ Collection = (function(_super) {
 
   Collection.prototype.removeAt = function(idx, silent) {
     return this.remove(this.at(idx), silent);
+  };
+
+  Collection.prototype.replace = function(o, nu, silent) {
+    var idx;
+    idx = this.indexOf(o);
+    if (idx !== -1) {
+      this.replaceAt(idx, nu, silent);
+    }
+    return this;
+  };
+
+  Collection.prototype.replaceAt = function(idx, nu, silent) {
+    var mods;
+    mods = this.get('models');
+    mods[idx] = this._processModel(nu);
+    this.set('models', mods, silent);
+    return this;
   };
 
   Collection.prototype.reset = function(o, silent) {
@@ -3057,19 +3463,6 @@ Collection = (function(_super) {
     return this.get('models');
   };
 
-  Collection.prototype.toJSON = function() {
-    var out;
-    out = Collection.__super__.toJSON.apply(this, arguments);
-    out.models = this.map(function(mod) {
-      if (mod != null ? mod.toJSON : void 0) {
-        return mod.toJSON();
-      } else {
-        return mod;
-      }
-    });
-    return out;
-  };
-
   Collection.prototype.fetch = function(opt, cb) {
     var _this = this;
     if (typeof opt === 'function' && !cb) {
@@ -3094,6 +3487,15 @@ Collection = (function(_super) {
       }
     });
     return this;
+  };
+
+  Collection.prototype._processModel = function(o) {
+    var mod;
+    if (this.model && !(o instanceof Model)) {
+      return mod = new this.model(o);
+    } else {
+      return mod = o;
+    }
   };
 
   return Collection;
@@ -3517,6 +3919,7 @@ module.exports = dermis;
 
 });
 require.alias("component-emitter/index.js", "dermis/deps/emitter/index.js");
+require.alias("component-indexof/index.js", "component-emitter/deps/indexof/index.js");
 
 require.alias("apily-guid/index.js", "dermis/deps/guid/index.js");
 
@@ -3533,10 +3936,17 @@ require.alias("visionmedia-page.js/index.js", "dermis/deps/page/index.js");
 require.alias("visionmedia-superagent/lib/client.js", "dermis/deps/superagent/lib/client.js");
 require.alias("visionmedia-superagent/lib/client.js", "dermis/deps/superagent/index.js");
 require.alias("component-emitter/index.js", "visionmedia-superagent/deps/emitter/index.js");
+require.alias("component-indexof/index.js", "component-emitter/deps/indexof/index.js");
 
 require.alias("RedVentures-reduce/index.js", "visionmedia-superagent/deps/reduce/index.js");
 
 require.alias("visionmedia-superagent/lib/client.js", "visionmedia-superagent/index.js");
+
+require.alias("aheckmann-mpath/lib/index.js", "dermis/deps/mpath/lib/index.js");
+require.alias("aheckmann-mpath/lib/index.js", "dermis/deps/mpath/index.js");
+require.alias("aheckmann-mpath/lib/index.js", "aheckmann-mpath/index.js");
+
+require.alias("yields-prevent/index.js", "dermis/deps/prevent/index.js");
 
 require.alias("dermis/dist/dermis.js", "dermis/index.js");
 
